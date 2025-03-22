@@ -12,22 +12,22 @@ struct ListaEnlazada {
     int size = 0;
 };
 
-// Usamos make_unique para trabajar siempre con unique_ptr.
+// Uso make_unique para usar unique_ptr.
 unique_ptr<Nodo> create_node(int valor) {
     return make_unique<Nodo>(Nodo{valor, nullptr});
 }
 
 // Inserta un nodo al inicio de la lista.
-// Movemos la cabeza actual al siguiente del nuevo nodo.
+
 void push_front(ListaEnlazada& lista, int valor) {
     unique_ptr<Nodo> nuevo = create_node(valor);
+    // Mueve la cabeza actual al siguiente del nuevo nodo.
     nuevo->siguiente = move(lista.cabeza);
     lista.cabeza = move(nuevo);
     lista.size++;
 }
 
 // Inserta un nodo al final de la lista.
-// Recorremos hasta el último nodo para enlazar el nuevo.
 void push_back(ListaEnlazada& lista, int valor) {
     unique_ptr<Nodo> nuevo = create_node(valor);
 
@@ -35,6 +35,7 @@ void push_back(ListaEnlazada& lista, int valor) {
         lista.cabeza = move(nuevo);
     } else {
         Nodo* temp = lista.cabeza.get();
+        // Recorro hasta el último nodo para enlazar el nuevo.
         while (temp->siguiente) {
             temp = temp->siguiente.get();
         }
@@ -67,7 +68,6 @@ void insert(ListaEnlazada& lista, int valor, int posicion) {
 }
 
 // Elimina un nodo en la posición indicada.
-// Si la posición es inválida, no se hace nada.
 void erase(ListaEnlazada& lista, int posicion) {
     if (!lista.cabeza || posicion < 0) return;
 
@@ -91,7 +91,7 @@ void erase(ListaEnlazada& lista, int posicion) {
     }
 }
 
-// Recorre e imprime la lista enlazada, mostrando el tamaño al final.
+// Recorre e imprime la lista enlazada, muestra el tamaño al final.
 void print_list(const ListaEnlazada& lista) {
     Nodo* temp = lista.cabeza.get();
     while (temp) {
@@ -99,28 +99,31 @@ void print_list(const ListaEnlazada& lista) {
         if (temp->siguiente) cout << " -> ";
         temp = temp->siguiente.get();
     }
-    cout << " (Size: " << lista.size << ")" << endl;
+    cout << " (Tamaño: " << lista.size << ")" << endl;
 }
 
 int main() {
     auto lista = make_unique<ListaEnlazada>();
-    //Agregar couts con pasos
+    
+    push_front(*lista, 4);
     push_front(*lista, 3);
     push_front(*lista, 2);
     push_front(*lista, 1);
-    print_list(*lista);  // 1 -> 2 -> 3 (Size: 3)
+    print_list(*lista);  
 
-    push_back(*lista, 4);
     push_back(*lista, 5);
-    print_list(*lista);  // 1 -> 2 -> 3 -> 4 -> 5 (Size: 5)
+    push_back(*lista, 6);
+    push_back(*lista, 7);
+    push_back(*lista, 8);
+    print_list(*lista);  
 
     insert(*lista, 0, 0);
-    insert(*lista, 6, 10);  // posición mayor al largo (se agrega al final)
-    print_list(*lista);  // 0 -> 1 -> 2 -> 3 -> 4 -> 5 -> 6 (Size: 7)
+    insert(*lista, 9, 15);  // posición inválida (inserta al final)
+    print_list(*lista);  
 
     erase(*lista, 2);
-    erase(*lista, 10);  // posición inválida (borra el ultimo)
-    print_list(*lista);  // 0 -> 1 -> 3 -> 4 -> 5 -> 6 (Size: 6)
+    erase(*lista, 12);  // posición inválida (borra el ultimo)
+    print_list(*lista);  
 
     return 0;
 }
